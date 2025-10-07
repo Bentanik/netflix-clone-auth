@@ -82,10 +82,10 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/netflix-clone-gateway:${{ steps.version.outputs.new_version }}
-            ${{ secrets.DOCKER_USERNAME }}/netflix-clone-gateway:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/netflix-clone-gateway:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/netflix-clone-gateway:buildcache,mode=max
+            ${{ secrets.DOCKER_USERNAME }}/netflix-clone-auth:${{ steps.version.outputs.new_version }}
+            ${{ secrets.DOCKER_USERNAME }}/netflix-clone-auth:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/netflix-clone-auth:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/netflix-clone-auth:buildcache,mode=max
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
@@ -98,8 +98,8 @@ jobs:
             ## Release ${{ steps.version.outputs.new_version }}
             
             ### Docker Images
-            - `${{ secrets.DOCKER_USERNAME }}/netflix-clone-gateway:${{ steps.version.outputs.new_version }}`
-            - `${{ secrets.DOCKER_USERNAME }}/netflix-clone-gateway:latest`
+            - `${{ secrets.DOCKER_USERNAME }}/netflix-clone-auth:${{ steps.version.outputs.new_version }}`
+            - `${{ secrets.DOCKER_USERNAME }}/netflix-clone-auth:latest`
             
             ### Changes
             Auto-generated release by GitHub Actions
