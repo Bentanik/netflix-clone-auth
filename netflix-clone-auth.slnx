@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/netflix-clone-auth.Api/netflix-clone-auth.Api.csproj" />
+  </Folder>
+</Solution>
