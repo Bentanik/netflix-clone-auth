@@ -25,7 +25,7 @@ public sealed class RegisterEmailHandler
             IsEmailConfirmed = false
         };
 
-        await _dbContext.Users.AddAsync(user, cancellationToken);
+        _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

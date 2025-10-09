@@ -1,6 +1,7 @@
 ﻿// External libraries
 global using System.Reflection;
 global using Carter;
+global using FluentValidation;
 global using Microsoft.Extensions.Options;
 global using Microsoft.OpenApi.Any;
 global using Microsoft.OpenApi.Models;
@@ -15,6 +16,10 @@ global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 // Project namespaces
 global using netflix_clone_auth.Api.DependencyInjection.Options;
 global using netflix_clone_auth.Api.DependencyInjection.Extensions;
+global using netflix_clone_auth.Api.Endpoints.Requests;
+global using netflix_clone_auth.Api.Persistence;
+global using netflix_clone_auth.Api.Settings;
+global using netflix_clone_auth.Api.Persistence.Entitiy;
 global using netflix_clone_shared;
 global using netflix_clone_shared.Entities;
 global using netflix_clone_shared.Mediator;
@@ -22,6 +27,3 @@ global using netflix_clone_shared.Middlewares;
 global using netflix_clone_shared.Idempotence;
 global using netflix_clone_shared.CQRS;
 global using netflix_clone_shared.Results;
-global using netflix_clone_auth.Api.Persistence;
-global using netflix_clone_auth.Api.Settings;
-global using netflix_clone_auth.Api.Persistence.Entitiy;

@@ -1,4 +1,6 @@
-﻿namespace netflix_clone_auth.Api.Endpoints;
+﻿using netflix_clone_auth.Api.Features.RegisterEmail;
+
+namespace netflix_clone_auth.Api.Endpoints;
 
 public class AuthEndpoint : ICarterModule
 {
@@ -12,8 +14,18 @@ public class AuthEndpoint : ICarterModule
         group.MapPost("/register-email", HandleRegisterEmailAsync);
     }
 
-    private static async Task<IResult> HandleRegisterEmailAsync([FromServices] IMessageBus messageBus)
+    private static async Task<IResult> HandleRegisterEmailAsync(
+        [FromServices] IMessageBus messageBus,
+        [FromBody] RegisterEmailRequest request)
     {
-        return Results.Ok("Register Email");
+        var registerEmailCommand = new RegisterEmailCommand(
+            Email: request.Email,
+            DisplayName: request.DisplayName,
+            Password: request.Password
+        );
+        
+        var result = await messageBus.Send(registerEmailCommand);
+
+        return result.IsFailure ? Results.BadRequest(result) : Results.Ok(result);
     }
 }
