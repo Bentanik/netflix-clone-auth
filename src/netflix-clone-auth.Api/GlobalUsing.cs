@@ -12,6 +12,7 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Storage;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using System.Linq.Expressions;
 
 // Project namespaces
 global using netflix_clone_auth.Api.DependencyInjection.Options;
@@ -20,6 +21,8 @@ global using netflix_clone_auth.Api.Endpoints.Requests;
 global using netflix_clone_auth.Api.Persistence;
 global using netflix_clone_auth.Api.Settings;
 global using netflix_clone_auth.Api.Persistence.Entitiy;
+global using netflix_clone_auth.Api.DTOs;
+global using netflix_clone_auth.Api.Persistence.Repositories;
 global using netflix_clone_shared;
 global using netflix_clone_shared.Entities;
 global using netflix_clone_shared.Mediator;
@@ -27,3 +30,6 @@ global using netflix_clone_shared.Middlewares;
 global using netflix_clone_shared.Idempotence;
 global using netflix_clone_shared.CQRS;
 global using netflix_clone_shared.Results;
+global using netflix_clone_shared.Messages;
+global using netflix_clone_shared.Exceptions;
+global using netflix_clone_shared.RequestContext;

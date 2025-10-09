@@ -5,17 +5,39 @@ namespace netflix_clone_auth.Api.Features.RegisterEmail;
 public sealed class RegisterEmailHandler
     : ICommandHandler<RegisterEmailCommand>
 {
-    private readonly AppDbContext _dbContext;
+    private readonly ICommandRepository<User, Guid> _userRepo;
     private readonly IPasswordHashService _passwordHashService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public RegisterEmailHandler(AppDbContext dbContext, IPasswordHashService passwordHashService)
+    public RegisterEmailHandler
+        (IPasswordHashService passwordHashService,
+        ICommandRepository<User, Guid> userRepo,
+        IUnitOfWork unitOfWork)
     {
-        _dbContext = dbContext;
+        _userRepo = userRepo;
         _passwordHashService = passwordHashService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result> Handle(RegisterEmailCommand command, CancellationToken cancellationToken)
     {
+        var existingUser = await _userRepo.AnyAsync(
+            predicate: u => u.Email == command.Email,
+            isTracking: false,
+            cancellationToken: cancellationToken
+        );
+
+
+        if(existingUser)
+        {
+            var error = new Error
+            (
+                code: AuthMessages.EmailExist.GetMessage().Code,
+                message: AuthMessages.EmailExist.GetMessage().Message
+            );
+            return Result.Failure([error]);
+        }
+
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -25,9 +47,13 @@ public sealed class RegisterEmailHandler
             IsEmailConfirmed = false
         };
 
-        _dbContext.Users.Add(user);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _userRepo.AddAsync(user, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success();
+        // Todo: Send confirmation email
+
+        return Result.Success(
+            code: AuthMessages.RegisterSuccessfully.GetMessage().Code,
+            message: AuthMessages.RegisterSuccessfully.GetMessage().Message);
     }
 }

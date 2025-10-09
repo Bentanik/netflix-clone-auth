@@ -1,8 +1,8 @@
-﻿namespace netflix_clone_auth.Api.Features.RegisterEmail;
+﻿namespace netflix_clone_auth.Api.Features.LoginEmail;
 
-public class RegisterEmailValidator : AbstractValidator<RegisterEmailCommand>
+public class LoginEmailValidator : AbstractValidator<LoginEmailCommand>
 {
-    public RegisterEmailValidator()
+    public LoginEmailValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty()
@@ -17,11 +17,5 @@ public class RegisterEmailValidator : AbstractValidator<RegisterEmailCommand>
                 .WithMessage("Password must be at least 6 characters long.")
             .MaximumLength(100)
                 .WithMessage("Password must not exceed 100 characters.");
-
-        RuleFor(x => x.DisplayName)
-            .NotEmpty()
-                .WithMessage("Display name is required.")
-            .MaximumLength(50)
-                .WithMessage("Display name must not exceed 50 characters.");
     }
 }

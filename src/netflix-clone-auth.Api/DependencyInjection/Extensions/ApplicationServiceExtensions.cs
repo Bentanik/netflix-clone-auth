@@ -37,7 +37,10 @@ public static class ApplicationServiceExtensions
             });
         });
 
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services
+         .AddScoped<IUnitOfWork, UnitOfWork>()
+         .AddScoped(typeof(ICommandRepository<,>), typeof(CommandRepository<,>))
+         .AddScoped(typeof(IQueryRepository<>), typeof(QueryRepository<>));
 
         return services;
     }
@@ -63,6 +66,8 @@ public static class ApplicationServiceExtensions
         builder.Services
             .AddInfrastructureServices()
             .AddPersistenceService(builder.Configuration);
+
+        builder.Services.RegisterRequestContextServices();
 
         return builder;
     }
