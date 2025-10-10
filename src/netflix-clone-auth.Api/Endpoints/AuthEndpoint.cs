@@ -1,5 +1,6 @@
 ﻿using netflix_clone_auth.Api.Features.LoginEmail;
 using netflix_clone_auth.Api.Features.Logout;
+using netflix_clone_auth.Api.Features.RefreshToken;
 using netflix_clone_auth.Api.Features.RegisterEmail;
 
 namespace netflix_clone_auth.Api.Endpoints;
@@ -16,6 +17,7 @@ public class AuthEndpoint : ICarterModule
         group.MapPost("/register-email", HandleRegisterEmailAsync);
         group.MapPost("/login-email", HandleLoginEmailAsync);
         group.MapDelete("/logout", HandleLogoutAsync).RequireAuthorization();
+        group.MapPut("/refresh-token", HandleRefreshTokenAsync).RequireAuthorization();
     }
 
     private static async Task<IResult> HandleRegisterEmailAsync(
@@ -66,7 +68,6 @@ public class AuthEndpoint : ICarterModule
         return result.IsFailure ? Results.BadRequest(result) : Results.Ok(result);
     }
 
-
     private static async Task<IResult> HandleLogoutAsync(
       [FromServices] IMessageBus messageBus,
       [FromServices] IRequestContext requestContext,
@@ -80,6 +81,28 @@ public class AuthEndpoint : ICarterModule
             return Results.Unauthorized();
 
         var command = new LogoutCommand(
+            RequestId: requestId,
+            UserId: userId
+        );
+
+        var result = await messageBus.Send(command);
+
+        return result.IsFailure ? Results.BadRequest(result) : Results.Ok(result);
+    }
+
+    private static async Task<IResult> HandleRefreshTokenAsync(
+      [FromServices] IMessageBus messageBus,
+      [FromServices] IRequestContext requestContext,
+      [FromServices] IHttpContextAccessor httpContextAccessor)
+    {
+        string requestId = requestContext.GetIdempotencyKey()
+            ?? throw new AppExceptions.XRequestIdRequiredException();
+
+        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Results.Unauthorized();
+
+        var command = new RefreshTokenQuery(
             RequestId: requestId,
             UserId: userId
         );
