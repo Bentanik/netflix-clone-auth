@@ -7,7 +7,31 @@ public static class SwaggerExtensions
         services.AddSwaggerGen(options =>
         {
             options.OperationFilter<AddXRequestIdHeaderParameter>();
+
+            // Add JWT Bearer authentication to Swagger
+            var bearerScheme = new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: 'Bearer abc123'",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            };
+
+            options.AddSecurityDefinition("Bearer", bearerScheme);
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                { bearerScheme, Array.Empty<string>() }
+            });
         });
+
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
     }
 
@@ -22,6 +46,9 @@ public static class SwaggerExtensions
             options.DisplayRequestDuration();
             options.EnableTryItOutByDefault();
             options.DocExpansion(DocExpansion.None);
+
+            // Show the Authorize button
+            options.OAuthUsePkce();
         });
 
         app.MapGet("/", () => Results.Redirect("/swagger/index.html"))

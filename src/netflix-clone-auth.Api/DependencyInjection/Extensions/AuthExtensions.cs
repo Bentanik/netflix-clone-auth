@@ -6,52 +6,47 @@ public static class AuthExtensions
 {
     public static IServiceCollection AddAuthenticationAndAuthorization(this IServiceCollection services, IConfiguration configuration)
     {
-        var authSettings = configuration.GetSection(AuthSettings.SectionName).Get<AuthSettings>();
+        var authSettings = configuration.GetSection(AuthSettings.SectionName).Get<AuthSettings>()
+            ?? throw new ArgumentNullException(nameof(AuthSettings), $"'{AuthSettings.SectionName}' section missing.");
 
-        if (authSettings == null)
-        {
-            throw new ArgumentNullException(
-                nameof(authSettings),
-                $"Configuration section '{AuthSettings.SectionName}' is missing or invalid."
-            );
-        }
+        services.Configure<AuthSettings>(configuration.GetSection(AuthSettings.SectionName));
 
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-       .AddJwtBearer(options =>
-       {
-           options.SaveToken = true;
-           options.TokenValidationParameters = new TokenValidationParameters
-           {
-               ValidateIssuer = false,
-               ValidateAudience = false,
-               ValidateLifetime = true,
-               ValidateIssuerSigningKey = true,
-               IssuerSigningKey = new SymmetricSecurityKey(
-                   Encoding.UTF8.GetBytes(authSettings.AccessSecretToken)),
-               ClockSkew = TimeSpan.Zero
-           };
+        .AddJwtBearer(options =>
+        {
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = authSettings.Issuer,
+                ValidAudience = authSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(authSettings.AccessSecretToken)),
+                ClockSkew = TimeSpan.Zero
+            };
 
-           options.Events = new JwtBearerEvents
-           {
-               OnAuthenticationFailed = context =>
-               {
-                   if (context.Exception is SecurityTokenExpiredException)
-                   {
-                       if (!context.Response.Headers.ContainsKey("X-Token-Expired"))
-                       {
-                           context.Response.Headers.Append("X-Token-Expired", "true");
-                       }
-                   }
-                   return Task.CompletedTask;
-               }
-           };
-       });
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    if (context.Exception is SecurityTokenExpiredException)
+                    {
+                        context.Response.Headers.Append("X-Token-Expired", "true");
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        });
 
         services.AddAuthorization();
+        services.AddHttpContextAccessor();
 
         return services;
     }

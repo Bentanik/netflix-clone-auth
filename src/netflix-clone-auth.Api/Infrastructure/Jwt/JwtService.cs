@@ -11,17 +11,16 @@ public class JwtService : IJwtService
 
     public TokenResult GenerateAccessToken(UserDto user)
     {
-        if(user.Id == null)
+        if (user.Id == null)
             throw new ArgumentNullException(nameof(user.Id), "User ID cannot be null");
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.AccessSecretToken));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
         var expires = DateTime.UtcNow.AddMinutes(_settings.AccessTokenExpMinute);
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()!),
         };
 
         var token = new JwtSecurityToken(
@@ -42,12 +41,11 @@ public class JwtService : IJwtService
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.RefreshSecretToken));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
         var expires = DateTime.UtcNow.AddMinutes(_settings.RefreshTokenExpMinute);
 
         var claims = new List<Claim>
         {
-            new("uid", user.Id.ToString()),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()!),
             new(JwtRegisteredClaimNames.Jti, jti)
         };
 
@@ -80,7 +78,7 @@ public class JwtService : IJwtService
                 ValidateAudience = true,
                 ValidAudience = _settings.Audience,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromSeconds(30)
+                ClockSkew = TimeSpan.Zero
             }, out var validatedToken);
 
             if (validatedToken is JwtSecurityToken jwt &&

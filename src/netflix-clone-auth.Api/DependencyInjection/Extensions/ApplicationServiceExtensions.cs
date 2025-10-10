@@ -115,6 +115,12 @@ public static class ApplicationServiceExtensions
         builder.Services.AddScoped<ExceptionHandlingMiddleware>();
         builder.Services.AddIdempotenceRequest();
 
+        // Context
+        builder.Services.RegisterRequestContextServices();
+
+        // Authentication + Authorization
+        builder.Services.AddAuthenticationAndAuthorization(builder.Configuration);
+
         // Carter
         builder.Services.AddCarter();
 
@@ -122,9 +128,6 @@ public static class ApplicationServiceExtensions
         builder.Services
             .AddInfrastructureServices(builder.Configuration)
             .AddPersistenceServices(builder.Configuration);
-
-        // Context
-        builder.Services.RegisterRequestContextServices();
 
         return builder;
     }

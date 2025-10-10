@@ -23,10 +23,10 @@ public sealed class LoginEmailQueryHandler : IQueryHandler<LoginEmailQuery, Auth
         _responseCacheService = responseCacheService;
     }
 
-    public async Task<Result<AuthLoginDto>> Handle(LoginEmailQuery command, CancellationToken cancellationToken)
+    public async Task<Result<AuthLoginDto>> Handle(LoginEmailQuery query, CancellationToken cancellationToken)
     {
         var parameters = new DynamicParameters();
-        parameters.Add("@Email", command.Email);
+        parameters.Add("@Email", query.Email);
 
         var user = await _userRepo.FindOneAsync(
             whereClause: "\"Email\" = @Email",
@@ -34,7 +34,7 @@ public sealed class LoginEmailQueryHandler : IQueryHandler<LoginEmailQuery, Auth
             cancellationToken: cancellationToken
         );
 
-        if (user == null || _passwordHashService.VerifyPassword(command.Password, user.PasswordHash) == false)
+        if (user == null || _passwordHashService.VerifyPassword(query.Password, user.PasswordHash) == false)
         {
             var err = new Error(
                 code: AuthMessages.InvalidCredentials.GetMessage().Code,

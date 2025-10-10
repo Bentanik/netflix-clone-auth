@@ -9,8 +9,12 @@ public static class MiddlewareExtensions
             app.ConfigureSwagger();
         }
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.MapCarter();
         app.UseMiddleware<ExceptionHandlingMiddleware>();
+
         app.NewVersionedApi();
     }
 }
