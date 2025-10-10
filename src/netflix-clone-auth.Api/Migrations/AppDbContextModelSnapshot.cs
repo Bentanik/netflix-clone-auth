@@ -45,7 +45,7 @@ namespace netflix_clone_auth.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshToken", (string)null);
                 });
 
             modelBuilder.Entity("netflix_clone_auth.Api.Persistence.Entitiy.User", b =>
@@ -81,7 +81,7 @@ namespace netflix_clone_auth.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("netflix_clone_auth.Api.Persistence.Entitiy.RefreshToken", b =>

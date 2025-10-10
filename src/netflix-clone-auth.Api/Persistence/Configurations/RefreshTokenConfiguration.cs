@@ -4,6 +4,8 @@ internal sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<Refre
 {
     public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
+        builder.ToTable(nameof(RefreshToken));
+
         builder.HasKey(rt => rt.Id);
     }
 }

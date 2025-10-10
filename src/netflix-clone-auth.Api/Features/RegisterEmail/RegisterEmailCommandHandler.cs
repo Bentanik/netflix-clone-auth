@@ -2,14 +2,14 @@
 
 namespace netflix_clone_auth.Api.Features.RegisterEmail;
 
-public sealed class RegisterEmailHandler
+public sealed class RegisterEmailCommandHandler
     : ICommandHandler<RegisterEmailCommand>
 {
     private readonly ICommandRepository<User, Guid> _userRepo;
     private readonly IPasswordHashService _passwordHashService;
     private readonly IUnitOfWork _unitOfWork;
 
-    public RegisterEmailHandler
+    public RegisterEmailCommandHandler
         (IPasswordHashService passwordHashService,
         ICommandRepository<User, Guid> userRepo,
         IUnitOfWork unitOfWork)
@@ -28,7 +28,7 @@ public sealed class RegisterEmailHandler
         );
 
 
-        if(existingUser)
+        if (existingUser)
         {
             var error = new Error
             (

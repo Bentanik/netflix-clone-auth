@@ -1,3 +1,3 @@
 ﻿namespace netflix_clone_auth.Api.DTOs;
 
-public record AuthLoginDto(AuthUserDto AuthUser);
+public record AuthLoginDto(TokenResult AuthToken, AuthUserDto AuthUser);

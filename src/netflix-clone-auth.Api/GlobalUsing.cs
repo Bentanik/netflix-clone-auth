@@ -1,6 +1,7 @@
 ﻿// External libraries
 global using System.Reflection;
 global using Carter;
+global using Npgsql;
 global using FluentValidation;
 global using Microsoft.Extensions.Options;
 global using Microsoft.OpenApi.Any;
@@ -13,6 +14,13 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Storage;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using System.Linq.Expressions;
+global using System.Data;
+global using Dapper;
+global using System.IdentityModel.Tokens.Jwt;
+global using System.Security.Claims;
+global using System.Text;
+global using StackExchange.Redis;
+global using Microsoft.IdentityModel.Tokens;
 
 // Project namespaces
 global using netflix_clone_auth.Api.DependencyInjection.Options;
@@ -33,3 +41,4 @@ global using netflix_clone_shared.Results;
 global using netflix_clone_shared.Messages;
 global using netflix_clone_shared.Exceptions;
 global using netflix_clone_shared.RequestContext;
+

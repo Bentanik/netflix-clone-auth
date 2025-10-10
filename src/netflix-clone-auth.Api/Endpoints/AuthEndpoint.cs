@@ -44,7 +44,7 @@ public class AuthEndpoint : ICarterModule
         string requestId = requestContext.GetIdempotencyKey()
             ?? throw new AppExceptions.XRequestIdRequiredException();
 
-        var registerEmailCommand = new LoginEmailCommand(
+        var registerEmailCommand = new LoginEmailQuery(
             RequestId: requestId,
             Email: request.Email,
             Password: request.Password

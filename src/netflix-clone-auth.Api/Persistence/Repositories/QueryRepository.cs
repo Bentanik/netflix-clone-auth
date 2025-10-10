@@ -2,22 +2,37 @@
 
 public class QueryRepository<TEntity> : IQueryRepository<TEntity> where TEntity : class
 {
-    protected readonly AppDbContext _context;
-    protected readonly DbSet<TEntity> _dbSet;
+    private readonly IDbConnection _connection;
 
-    public QueryRepository(AppDbContext context)
+    public QueryRepository(IDbConnection connection)
     {
-        _context = context;
-        _dbSet = _context.Set<TEntity>();
+        _connection = connection;
     }
+
+    private string GetTableName()
+        => $"\"{typeof(TEntity).Name}\""; // quote để PostgreSQL case-sensitive
 
     public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
+        var sql = $"SELECT * FROM {GetTableName()}";
+        return await _connection.QueryAsync<TEntity>(new CommandDefinition(sql, cancellationToken: cancellationToken));
     }
 
-    public async Task<IEnumerable<TEntity>> FindAsync(Func<TEntity, bool> predicate, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<TEntity>> FindAsync(string whereClause, object? parameters = null, CancellationToken cancellationToken = default)
     {
-        return await Task.FromResult(_dbSet.AsNoTracking().Where(predicate).ToList());
+        var sql = $"SELECT * FROM {GetTableName()} WHERE {whereClause}";
+        return await _connection.QueryAsync<TEntity>(new CommandDefinition(sql, parameters, cancellationToken: cancellationToken));
+    }
+
+    public async Task<TEntity?> FindOneAsync(string whereClause, object? parameters = null, CancellationToken cancellationToken = default)
+    {
+        var sql = $"SELECT * FROM {GetTableName()} WHERE {whereClause} LIMIT 1";
+        return await _connection.QueryFirstOrDefaultAsync<TEntity>(new CommandDefinition(sql, parameters, cancellationToken: cancellationToken));
+    }
+
+    public async Task<bool> ExistsAsync(string whereClause, object? parameters = null, CancellationToken cancellationToken = default)
+    {
+        var sql = $"SELECT EXISTS (SELECT 1 FROM {GetTableName()} WHERE {whereClause})";
+        return await _connection.ExecuteScalarAsync<bool>(new CommandDefinition(sql, parameters, cancellationToken: cancellationToken));
     }
 }

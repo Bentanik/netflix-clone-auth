@@ -1,6 +1,6 @@
 ﻿namespace netflix_clone_auth.Api.Features.LoginEmail;
 
-public class LoginEmailValidator : AbstractValidator<LoginEmailCommand>
+public class LoginEmailValidator : AbstractValidator<LoginEmailQuery>
 {
     public LoginEmailValidator()
     {
