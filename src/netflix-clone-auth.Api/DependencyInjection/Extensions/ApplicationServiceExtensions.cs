@@ -1,6 +1,7 @@
 ﻿using netflix_clone_auth.Api.Infrastructure.Jwt;
 using netflix_clone_auth.Api.Infrastructure.PasswordHash;
 using netflix_clone_auth.Api.Infrastructure.ResponseCache;
+using StackExchange.Redis;
 
 namespace netflix_clone_auth.Api.DependencyInjection.Extensions;
 

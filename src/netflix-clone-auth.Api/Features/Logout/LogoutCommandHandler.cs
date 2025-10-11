@@ -1,4 +1,5 @@
 using netflix_clone_auth.Api.Infrastructure.ResponseCache;
+using netflix_clone_auth.Api.Messages;
 
 namespace netflix_clone_auth.Api.Features.Logout;
 

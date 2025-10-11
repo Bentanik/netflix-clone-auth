@@ -1,4 +1,6 @@
-﻿namespace netflix_clone_auth.Api.Infrastructure.ResponseCache;
+﻿using StackExchange.Redis;
+
+namespace netflix_clone_auth.Api.Infrastructure.ResponseCache;
 
 public class ResponseCacheService : IResponseCacheService
 {
