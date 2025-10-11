@@ -6,37 +6,46 @@ namespace netflix_clone_auth.Api.Features.RegisterEmail;
 public sealed class RegisterEmailCommandHandler
     : ICommandHandler<RegisterEmailCommand>
 {
-    private readonly ICommandRepository<User, Guid> _userRepo;
+    private readonly IUserCommandRepository _userRepo;
     private readonly IPasswordHashService _passwordHashService;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly UserSettings _userSettings;
 
     public RegisterEmailCommandHandler
         (IPasswordHashService passwordHashService,
-        ICommandRepository<User, Guid> userRepo,
-        IUnitOfWork unitOfWork)
+        IUserCommandRepository userRepo,
+        IUnitOfWork unitOfWork,
+        IOptions<UserSettings> userSettings)
     {
         _userRepo = userRepo;
         _passwordHashService = passwordHashService;
         _unitOfWork = unitOfWork;
+        _userSettings = userSettings.Value;
     }
 
     public async Task<Result> Handle(RegisterEmailCommand command, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepo.AnyAsync(
-            predicate: u => u.Email == command.Email,
-            isTracking: false,
-            cancellationToken: cancellationToken
-        );
+        var existingUser = await _userRepo.CheckEmailAndDisplayNameAsync(command.Email, command.DisplayName, cancellationToken);
 
-
-        if (existingUser)
+        if (existingUser is not null)
         {
-            var error = new Error
-            (
-                code: AuthMessages.EmailExist.GetMessage().Code,
-                message: AuthMessages.EmailExist.GetMessage().Message
-            );
-            return Result.Failure([error]);
+            var errors = new List<Error>(2);
+
+            if (existingUser[0] == 1)
+            {
+                errors.Add(new Error(
+                    code: AuthMessages.EmailExist.GetMessage().Code,
+                    message: AuthMessages.EmailExist.GetMessage().Message));
+            }
+
+            if (existingUser[1] == 1)
+            {
+                errors.Add(new Error(
+                    code: AuthMessages.DisplayNameExist.GetMessage().Code,
+                    message: AuthMessages.DisplayNameExist.GetMessage().Message));
+            }
+
+            return Result.Failure(errors);
         }
 
         var user = new User
@@ -45,6 +54,8 @@ public sealed class RegisterEmailCommandHandler
             DisplayName = command.DisplayName,
             Email = command.Email,
             PasswordHash = _passwordHashService.HashPassword(command.Password),
+            AvatarId = _userSettings.AvatarId,
+            AvatarUrl = _userSettings.AvatarUrl,
             IsEmailConfirmed = false
         };
 

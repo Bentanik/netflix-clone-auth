@@ -13,6 +13,7 @@ public static class ApplicationServiceExtensions
         services.Configure<DatabaseSettings>(configuration.GetSection(DatabaseSettings.SectionName));
         services.Configure<AuthSettings>(configuration.GetSection(AuthSettings.SectionName));
         services.Configure<RedisSettings>(configuration.GetSection(RedisSettings.SectionName));
+        services.Configure<UserSettings>(configuration.GetSection(UserSettings.SectionName));
     }
 
     // -------------------- Swagger & API Versioning --------------------
@@ -95,7 +96,8 @@ public static class ApplicationServiceExtensions
 
         services.AddScoped<IUnitOfWork, UnitOfWork>()
                 .AddScoped(typeof(ICommandRepository<,>), typeof(CommandRepository<,>))
-                .AddScoped(typeof(IQueryRepository<>), typeof(QueryRepository<>));
+                .AddScoped(typeof(IQueryRepository<>), typeof(QueryRepository<>))
+                .AddScoped<IUserCommandRepository, UserCommandRepository>();
 
         return services;
     }

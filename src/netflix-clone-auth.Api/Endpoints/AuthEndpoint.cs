@@ -2,6 +2,7 @@
 using netflix_clone_auth.Api.Features.Logout;
 using netflix_clone_auth.Api.Features.RefreshToken;
 using netflix_clone_auth.Api.Features.RegisterEmail;
+using netflix_clone_auth.Api.Messages;
 
 namespace netflix_clone_auth.Api.Endpoints;
 
@@ -17,7 +18,9 @@ public class AuthEndpoint : ICarterModule
         group.MapPost("/register-email", HandleRegisterEmailAsync);
         group.MapPost("/login-email", HandleLoginEmailAsync);
         group.MapDelete("/logout", HandleLogoutAsync).RequireAuthorization();
-        group.MapPut("/refresh-token", HandleRefreshTokenAsync).RequireAuthorization();
+        group.MapPut("/refresh-token", HandleRefreshTokenAsync);
+
+        group.MapGet("", () => Results.Ok("Auth API")).RequireAuthorization();
     }
 
     private static async Task<IResult> HandleRegisterEmailAsync(
@@ -48,10 +51,12 @@ public class AuthEndpoint : ICarterModule
     {
         if (httpContextAccessor.HttpContext?.Request.Headers.ContainsKey("Authorization") == true)
         {
-            return Results.BadRequest(new
-            {
-                message = "Authorization header must not be provided when logging in."
-            });
+            var fail = Result.Failure([
+                new Error(
+                code: AuthMessages.AuthProvidedOnLogin.GetMessage().Code,
+                message: AuthMessages.AuthProvidedOnLogin.GetMessage().Message)
+            ]);
+            return Results.BadRequest(fail);
         }
 
         string requestId = requestContext.GetIdempotencyKey()
@@ -93,18 +98,14 @@ public class AuthEndpoint : ICarterModule
     private static async Task<IResult> HandleRefreshTokenAsync(
       [FromServices] IMessageBus messageBus,
       [FromServices] IRequestContext requestContext,
-      [FromServices] IHttpContextAccessor httpContextAccessor)
+      [FromBody] string refreshToken)
     {
         string requestId = requestContext.GetIdempotencyKey()
             ?? throw new AppExceptions.XRequestIdRequiredException();
 
-        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
-            return Results.Unauthorized();
-
         var command = new RefreshTokenQuery(
             RequestId: requestId,
-            UserId: userId
+            RefreshToken: refreshToken
         );
 
         var result = await messageBus.Send(command);

@@ -22,8 +22,28 @@ public sealed class RefreshTokenQueryHandler : IQueryHandler<RefreshTokenQuery, 
 
     public async Task<Result<AuthLoginDto>> Handle(RefreshTokenQuery query, CancellationToken cancellationToken)
     {
-        // The query.UserId contains the user id (string) that was embedded in the refresh token.
-        var userId = query.UserId;
+        var claims = _jwtService.ValidateRefreshToken(query.RefreshToken);
+        if(claims == null)
+        {
+            return Result.Failure<AuthLoginDto>([
+                new Error(
+                    code: AuthMessages.INVALID_TOKEN.GetMessage().Code,
+                    message: AuthMessages.INVALID_TOKEN.GetMessage().Message)
+            ]);
+        }
+
+        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
+        var jti = claims.FindFirstValue(JwtRegisteredClaimNames.Jti);
+
+        // Validate stored jti in cache
+        var cachedJti = await _responseCacheService.GetAsync($"RefreshToken_{userId}");
+        if (userId == null || string.IsNullOrEmpty(cachedJti) || !cachedJti.Equals(jti))
+        {
+            var err = new Error(
+                code: AuthMessages.INVALID_TOKEN.GetMessage().Code,
+                message: AuthMessages.INVALID_TOKEN.GetMessage().Message);
+            return Result.Failure<AuthLoginDto>([err]);
+        }
 
         var parameters = new DynamicParameters();
         parameters.Add("@Id", Guid.Parse(userId));
@@ -41,24 +61,14 @@ public sealed class RefreshTokenQueryHandler : IQueryHandler<RefreshTokenQuery, 
             return Result.Failure<AuthLoginDto>(new[] { err });
         }
 
-        // Validate stored jti in cache
-        var cachedJti = await _responseCacheService.GetAsync($"RefreshToken_{userId}");
-        if (string.IsNullOrEmpty(cachedJti))
-        {
-            var err = new Error(
-                code: AuthMessages.INVALID_TOKEN.GetMessage().Code,
-                message: AuthMessages.INVALID_TOKEN.GetMessage().Message);
-            return Result.Failure<AuthLoginDto>(new[] { err });
-        }
-
         // Generate new tokens
         var userDto = new UserDto(user.Id.ToString());
         var newJti = Guid.NewGuid().ToString();
         var accessToken = _jwtService.GenerateAccessToken(userDto);
         var refreshToken = _jwtService.GenerateRefreshToken(userDto, newJti);
 
-        var authUserDto = new AuthUserDto(user.DisplayName, user.Email);
-        var authLoginDto = new AuthLoginDto(accessToken, authUserDto);
+        var authUserDto = new AuthUserDto(user.DisplayName, user.Email, user.AvatarUrl);
+        var authLoginDto = new AuthLoginDto(AccessToken: accessToken, RefreshToken: refreshToken, AuthUser: authUserDto);
 
         // Update cache with new jti and expiry
         await _responseCacheService.SetAsync(

@@ -12,8 +12,8 @@ using netflix_clone_auth.Api.Persistence;
 namespace netflix_clone_auth.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251010013105_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251011095855_IntialCreate")]
+    partial class IntialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,37 +25,23 @@ namespace netflix_clone_auth.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("netflix_clone_auth.Api.Persistence.Entitiy.RefreshToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshToken", (string)null);
-                });
-
             modelBuilder.Entity("netflix_clone_auth.Api.Persistence.Entitiy.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AvatarId")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("False");
+
+                    b.Property<string>("AvatarUrl")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("False");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -84,23 +70,13 @@ namespace netflix_clone_auth.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DisplayName")
+                        .IsUnique();
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.ToTable("User", (string)null);
-                });
-
-            modelBuilder.Entity("netflix_clone_auth.Api.Persistence.Entitiy.RefreshToken", b =>
-                {
-                    b.HasOne("netflix_clone_auth.Api.Persistence.Entitiy.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("netflix_clone_auth.Api.Persistence.Entitiy.User", b =>
-                {
-                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

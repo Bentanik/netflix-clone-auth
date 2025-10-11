@@ -20,5 +20,18 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.IsEmailConfirmed)
             .HasDefaultValue(false);
+
+        builder.Property(u => u.AvatarId)
+            .HasDefaultValue(false);
+
+        builder.Property(u => u.AvatarUrl)
+            .HasDefaultValue(false);
+
+        // Unique index
+        builder.HasIndex(u => u.Email)
+            .IsUnique();
+        
+        builder.HasIndex(u => u.DisplayName)
+            .IsUnique();
     }
 }

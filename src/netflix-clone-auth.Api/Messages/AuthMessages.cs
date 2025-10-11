@@ -8,18 +8,24 @@ public enum AuthMessages
     [Message("Email exist", "AUTH_02")]
     EmailExist,
 
-    [Message("Email or password is incorrect", "AUTH_03")]
+    [Message("DisplayName exist", "AUTH_03")]
+    DisplayNameExist,
+
+    [Message("Email or password is incorrect", "AUTH_04")]
     InvalidCredentials,
 
-    [Message("Login successfully", "AUTH_04")]
+    [Message("Login successfully", "AUTH_05")]
     LoginSuccessfully,
 
-    [Message("Logout successfully", "AUTH_05")]
+    [Message("Logout successfully", "AUTH_06")]
     LogoutSuccessfully,
 
-    [Message("Refresh token successfully", "AUTH_06")]
+    [Message("Refresh token successfully", "AUTH_07")]
     RefreshTokenSuccessfully,
 
-    [Message("Refresh token not found or expired", "AUTH_07")]
-    INVALID_TOKEN
+    [Message("Refresh token not found or expired", "AUTH_08")]
+    INVALID_TOKEN,
+
+    [Message("Authorization must not be provided when logging in.", "AUTH_09")]
+    AuthProvidedOnLogin
 }

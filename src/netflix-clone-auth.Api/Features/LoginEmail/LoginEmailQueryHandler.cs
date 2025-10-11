@@ -48,8 +48,8 @@ public sealed class LoginEmailQueryHandler : IQueryHandler<LoginEmailQuery, Auth
         var accessToken = _jwtService.GenerateAccessToken(userDto);
         var refreshToken = _jwtService.GenerateRefreshToken(userDto, jti);
 
-        var authUserDto = new AuthUserDto(DisplayName: user.DisplayName, Email: user.Email);
-        var authLoginDto = new AuthLoginDto(AuthToken: accessToken, AuthUser: authUserDto);
+        var authUserDto = new AuthUserDto(DisplayName: user.DisplayName, Email: user.Email, AvatarUrl: user.AvatarUrl);
+        var authLoginDto = new AuthLoginDto(AccessToken: accessToken, RefreshToken: refreshToken, AuthUser: authUserDto);
 
         await _responseCacheService.SetAsync(
             key: $"RefreshToken_{userDto.Id}",

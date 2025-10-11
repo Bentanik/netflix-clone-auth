@@ -4,5 +4,5 @@ public interface IJwtService
 {
     TokenResult GenerateAccessToken(UserDto user);
     TokenResult GenerateRefreshToken(UserDto user, string jti);
-    ClaimsPrincipal? ValidateAccessToken(string token);
+    ClaimsPrincipal? ValidateRefreshToken(string token);
 }

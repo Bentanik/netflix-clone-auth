@@ -60,12 +60,12 @@ public class JwtService : IJwtService
         return new TokenResult(tokenString, expires);
     }
 
-    public ClaimsPrincipal? ValidateAccessToken(string token)
+    public ClaimsPrincipal? ValidateRefreshToken(string token)
     {
         if (string.IsNullOrWhiteSpace(token)) return null;
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_settings.AccessSecretToken);
+        var key = Encoding.UTF8.GetBytes(_settings.RefreshSecretToken);
 
         try
         {
