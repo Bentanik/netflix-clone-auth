@@ -37,10 +37,10 @@ public sealed class LoginEmailQueryHandler : IQueryHandler<LoginEmailQuery, Auth
 
         if (user == null || _passwordHashService.VerifyPassword(query.Password, user.PasswordHash) == false)
         {
-            var err = new Error(
+            var err = new Error<object>(
                 code: AuthMessages.InvalidCredentials.GetMessage().Code,
                 message: AuthMessages.InvalidCredentials.GetMessage().Message);
-            return Result.Failure<AuthLoginDto>([err]);
+            return Result<AuthLoginDto>.Failure([err]);
         }
 
         var userDto = new UserDto(Id: user.Id.ToString());
@@ -57,7 +57,7 @@ public sealed class LoginEmailQueryHandler : IQueryHandler<LoginEmailQuery, Auth
             expiry: refreshToken.ExpiresAt - DateTime.UtcNow
         );
 
-        return Result.Success(
+        return Result<AuthLoginDto>.Success(
             data: authLoginDto, 
             code: AuthMessages.LoginSuccessfully.GetMessage().Code,
             message: AuthMessages.LoginSuccessfully.GetMessage().Message);

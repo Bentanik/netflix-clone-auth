@@ -23,24 +23,24 @@ public sealed class RegisterEmailCommandHandler
         _userSettings = userSettings.Value;
     }
 
-    public async Task<Result> Handle(RegisterEmailCommand command, CancellationToken cancellationToken)
+    public async Task<Result<object>> Handle(RegisterEmailCommand command, CancellationToken cancellationToken)
     {
         var existingUser = await _userRepo.CheckEmailAndDisplayNameAsync(command.Email, command.DisplayName, cancellationToken);
 
         if (existingUser is not null)
         {
-            var errors = new List<Error>(2);
+            var errors = new List<Error<object>>(2);
 
             if (existingUser[0] == 1)
             {
-                errors.Add(new Error(
+                errors.Add(new Error<object>(
                     code: AuthMessages.EmailExist.GetMessage().Code,
                     message: AuthMessages.EmailExist.GetMessage().Message));
             }
 
             if (existingUser[1] == 1)
             {
-                errors.Add(new Error(
+                errors.Add(new Error<object>(
                     code: AuthMessages.DisplayNameExist.GetMessage().Code,
                     message: AuthMessages.DisplayNameExist.GetMessage().Message));
             }

@@ -25,11 +25,10 @@ public sealed class RefreshTokenQueryHandler : IQueryHandler<RefreshTokenQuery, 
         var claims = _jwtService.ValidateRefreshToken(query.RefreshToken);
         if(claims == null)
         {
-            return Result.Failure<AuthLoginDto>([
-                new Error(
+            var error = new Error<object>(
                     code: AuthMessages.INVALID_TOKEN.GetMessage().Code,
-                    message: AuthMessages.INVALID_TOKEN.GetMessage().Message)
-            ]);
+                    message: AuthMessages.INVALID_TOKEN.GetMessage().Message);
+            return Result<AuthLoginDto>.Failure([error]);
         }
 
         var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -39,10 +38,10 @@ public sealed class RefreshTokenQueryHandler : IQueryHandler<RefreshTokenQuery, 
         var cachedJti = await _responseCacheService.GetAsync($"RefreshToken_{userId}");
         if (userId == null || string.IsNullOrEmpty(cachedJti) || !cachedJti.Equals(jti))
         {
-            var err = new Error(
+            var err = new Error<object>(
                 code: AuthMessages.INVALID_TOKEN.GetMessage().Code,
                 message: AuthMessages.INVALID_TOKEN.GetMessage().Message);
-            return Result.Failure<AuthLoginDto>([err]);
+            return Result<AuthLoginDto>.Failure([err]);
         }
 
         var parameters = new DynamicParameters();
@@ -55,10 +54,10 @@ public sealed class RefreshTokenQueryHandler : IQueryHandler<RefreshTokenQuery, 
 
         if (user == null)
         {
-            var err = new Error(
+            var err = new Error<object>(
                 code: AuthMessages.INVALID_TOKEN.GetMessage().Code,
                 message: AuthMessages.INVALID_TOKEN.GetMessage().Message);
-            return Result.Failure<AuthLoginDto>(new[] { err });
+            return Result<AuthLoginDto>.Failure([err]);
         }
 
         // Generate new tokens
@@ -77,7 +76,7 @@ public sealed class RefreshTokenQueryHandler : IQueryHandler<RefreshTokenQuery, 
             expiry: refreshToken.ExpiresAt - DateTime.UtcNow
         );
 
-        return Result.Success(
+        return Result<AuthLoginDto>.Success(
             data: authLoginDto,
             code: AuthMessages.LoginSuccessfully.GetMessage().Code,
             message: AuthMessages.LoginSuccessfully.GetMessage().Message);

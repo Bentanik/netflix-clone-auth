@@ -13,7 +13,7 @@ public sealed class LogoutCommandHandler : ICommandHandler<LogoutCommand>
         _responseCacheService = responseCacheService;
     }
 
-    public async Task<Result> Handle(LogoutCommand command, CancellationToken cancellationToken)
+    public async Task<Result<object>> Handle(LogoutCommand command, CancellationToken cancellationToken)
     {
         await _responseCacheService.RemoveAsync(
             key: $"RefreshToken_{command.UserId}"

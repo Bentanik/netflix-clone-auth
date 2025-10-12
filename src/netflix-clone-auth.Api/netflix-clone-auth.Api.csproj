@@ -28,7 +28,10 @@
 	  <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="8.3.0" />
 	  <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.3.0" />
 	  <PackageReference Include="StackExchange.Redis" Version="2.9.17" />
-	  <PackageReference Include="NetflixClone.Shared" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\netflix-clone-shared\netflix-clone-shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -12,8 +12,8 @@ using netflix_clone_auth.Api.Persistence;
 namespace netflix_clone_auth.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251011095855_IntialCreate")]
-    partial class IntialCreate
+    [Migration("20251012023842_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

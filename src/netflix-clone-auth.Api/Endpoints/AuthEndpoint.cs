@@ -51,11 +51,10 @@ public class AuthEndpoint : ICarterModule
     {
         if (httpContextAccessor.HttpContext?.Request.Headers.ContainsKey("Authorization") == true)
         {
-            var fail = Result.Failure([
-                new Error(
+            var err = new Error<object>(
                 code: AuthMessages.AuthProvidedOnLogin.GetMessage().Code,
-                message: AuthMessages.AuthProvidedOnLogin.GetMessage().Message)
-            ]);
+                message: AuthMessages.AuthProvidedOnLogin.GetMessage().Message);
+            var fail = Result.Failure([err]);
             return Results.BadRequest(fail);
         }
 
