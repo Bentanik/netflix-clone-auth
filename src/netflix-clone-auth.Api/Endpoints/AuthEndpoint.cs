@@ -19,8 +19,6 @@ public class AuthEndpoint : ICarterModule
         group.MapPost("/login-email", HandleLoginEmailAsync);
         group.MapDelete("/logout", HandleLogoutAsync).RequireAuthorization();
         group.MapPut("/refresh-token", HandleRefreshTokenAsync);
-
-        group.MapGet("", () => Results.Ok("Auth API")).RequireAuthorization();
     }
 
     private static async Task<IResult> HandleRegisterEmailAsync(
